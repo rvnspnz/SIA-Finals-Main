@@ -1,0 +1,11 @@
+/* src/components/Card.css */
+
+.card {
+    background-color: #ad885b;
+    border-radius: 30px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+  }
+  
