@@ -27,14 +27,28 @@ exports.addTransaction = async (req, res, next) => {
   try {
     const { text, amount } = req.body;
 
+    // Fetch all existing transactions to calculate the current balance
+    const transactions = await Transaction.find();
+    const currentBalance = transactions.reduce((acc, transaction) => acc + transaction.amount, 0);
+
+    // Check if the new transaction will cause the balance to be negative
+    if (currentBalance + amount < 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Insufficient balance, cannot add transaction'
+      });
+    }
+
+    // Create the new transaction
     const transaction = await Transaction.create(req.body);
-  
+
     return res.status(201).json({
       success: true,
+      message: 'Successfully added',
       data: transaction
-    }); 
+    });
   } catch (err) {
-    if(err.name === 'ValidationError') {
+    if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map(val => val.message);
 
       return res.status(400).json({
@@ -57,7 +71,7 @@ exports.deleteTransaction = async (req, res, next) => {
   try {
     const transaction = await Transaction.findById(req.params.id);
 
-    if(!transaction) {
+    if (!transaction) {
       return res.status(404).json({
         success: false,
         error: 'No transaction found'
